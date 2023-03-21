@@ -1,190 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Calculator</title>
-	<style>
-		#calculator {
-			margin: auto;
-			margin-top: 50px;
-			padding: 20px;
-			border: 1px solid black;
-			border-radius: 10px;
-			width: 300px;
-			height: 400px;
-			display: grid;
-			grid-template-columns: repeat(4, 1fr);
-			grid-template-rows: repeat(6, 1fr);
-			grid-gap: 10px;
-			background-color: #eee;
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-		}
-
-		#screen {
-			grid-column: 1 / span 4;
-			grid-row: 1;
-			font-size: 24px;
-			text-align: right;
-			padding: 5px;
-			background-color: white;
-			border-radius: 5px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-		}
-
-		.button {
-			background-color: #f2f2f2;
-			color: black;
-			font-size: 20px;
-			border: none;
-			border-radius: 5px;
-			box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-			cursor: pointer;
-			transition: background-color 0.3s ease;
-		}
-
-		.button:hover {
-			background-color: #d9d9d9;
-		}
-
-		.button:active {
-			background-color: #bfbfbf;
-		}
-
-		.function {
-			background-color: #ffa64d;
-			color: white;
-		}
-
-		#clear {
-			background-color: #ff4d4d;
-			color: white;
-		}
-
-		#equals {
-			background-color: #4dff4d;
-			color: white;
-			grid-row: 6 / span 2;
-		}
-	</style>
+    <title>Zeks Calculator</title>
+    <style>
+        #calculator {
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+        }
+        #iframe {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-	<div id="calculator">
-		<div id="screen"></div>
-		<button class="button function" id="clear">C</button>
-		<button class="button function" id="divide">/</button>
-		<button class="button" id="seven">7</button>
-		<button class="button" id="eight">8</button>
-		<button class="button" id="nine">9</button>
-		<button class="button function" id="multiply">*</button>
-		<button class="button" id="four">4</button>
-		<button class="button" id="five">5</button>
-		<button class="button" id="six">6</button>
-		<button class="button function" id="subtract">-</button>
-		<button class="button" id="one">1</button>
-		<button class="button" id="two">2</button>
-		<button class="button" id="three">3</button>
-		<button class="button function" id="add">+</button>
-		<button class="button" id="zero">0</button>
-		<button class="button" id="decimal">.</button>
-		<button class="button function" id="parentheses">(</button>
-                <button class="button function parentheses" id="right-parentheses">)</button>
-                <button class="button function" id="equals">=</button>
-</div>
-<iframe id="fullscreen-iframe"></iframe>
+    <div id="calculator">
+        Fake Calculator
+    </div>
+    <iframe id="iframe" src="https://msdbeable.netlify.app"></iframe>
 
-<script>
-	// Get the calculator elements
-	const screen = document.getElementById("screen");
-	const clearButton = document.getElementById("clear");
-	const divideButton = document.getElementById("divide");
-	const multiplyButton = document.getElementById("multiply");
-	const subtractButton = document.getElementById("subtract");
-	const addButton = document.getElementById("add");
-	const equalsButton = document.getElementById("equals");
-	const parenthesesButtons = document.querySelectorAll(".parentheses");
-	const numberButtons = document.querySelectorAll(".button:not(.function):not(.parentheses)");
-	const decimalButton = document.getElementById("decimal");
-	const zeroButton = document.getElementById("zero");
-	const leftParenthesisButton = document.getElementById("left-parentheses");
-	const rightParenthesisButton = document.getElementById("right-parentheses");
-
-	// Initialize the calculator state
-	let calculatorState = {
-		operand1: null,
-		operand2: null,
-		operator: null,
-		display: "0",
-		lastButtonPressed: null
-	};
-
-	// Update the screen display with the current calculator state
-	function updateDisplay() {
-		screen.innerHTML = calculatorState.display;
-	}
-
-	// Clear the calculator state
-	function clearCalculator() {
-		calculatorState.operand1 = null;
-		calculatorState.operand2 = null;
-		calculatorState.operator = null;
-		calculatorState.display = "0";
-		calculatorState.lastButtonPressed = null;
-		updateDisplay();
-	}
-
-	// Handle number button clicks
-	function handleNumberClick(event) {
-		const buttonValue = event.target.innerHTML;
-		if (calculatorState.lastButtonPressed === "operator" || calculatorState.display === "0") {
-			calculatorState.display = buttonValue;
-		} else {
-			calculatorState.display += buttonValue;
-		}
-		calculatorState.lastButtonPressed = "number";
-		updateDisplay();
-	}
-
-	// Handle decimal button click
-	function handleDecimalClick() {
-		if (!calculatorState.display.includes(".")) {
-			calculatorState.display += ".";
-		}
-		calculatorState.lastButtonPressed = "decimal";
-		updateDisplay();
-	}
-
-	// Handle operator button clicks
-	function handleOperatorClick(event) {
-		if (calculatorState.operand1 === null) {
-			calculatorState.operand1 = parseFloat(calculatorState.display);
-			calculatorState.operator = event.target.innerHTML;
-			calculatorState.display = "0";
-			calculatorState.lastButtonPressed = "operator";
-			updateDisplay();
-		} else {
-			calculatorState.operand2 = parseFloat(calculatorState.display);
-			const result = calculateResult();
-			calculatorState.operand1 = result;
-			calculatorState.operand2 = null;
-			calculatorState.operator = event.target.innerHTML;
-			calculatorState.display = "0";
-			calculatorState.lastButtonPressed = "operator";
-			updateDisplay();
-		}
-	}
-
-	// Calculate the result of the current operation
-	function calculateResult() {
-		const operand1 = calculatorState.operand1;
-		const operand2 = parseFloat(calculatorState.display);
-		switch (calculatorState.operator) {
-			case "+":
-				return operand1 + operand2;
-			case "-":
-				return operand1 - operand2;
-			case "*":
-				return operand1 * operand2;
-			case "/":
-				return operand1 / operand2;
-			default:
-				throw
-
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.key === ')') {
+                document.getElementById('calculator').style.display = 'none';
+                document.getElementById('iframe').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 
